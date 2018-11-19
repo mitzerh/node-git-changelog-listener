@@ -31,7 +31,7 @@ class Listener extends GitCommands {
         // default properties
         this.PROPERTIES = ((d) => {
             return {
-                basePath: d.basePath || __dirname,
+                basePath: d.basePath || process.cwd(),
                 interval: d.interval || 1000
             };
         })(props || {});
