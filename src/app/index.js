@@ -68,8 +68,9 @@ class Listener extends GitCommands {
 
         if (!self[PRIVATE_DATA].INITIALIZED) {
             self[PRIVATE_DATA].INITIALIZED = true;
+            trigger(true);
             self[PRIVATE_DATA].INTERVAL_INSTANCE = setInterval(() => {
-                trigger(true);
+                trigger();
             }, self.PROPERTIES.interval || 1000);
         }
 
@@ -83,31 +84,31 @@ class Listener extends GitCommands {
                     type: 'initialize',
                     change: false
                 });
-            }
-
-            // check if it is a branch change
-            let currBranch = self.gitCmd('current-branch');
-            if (currBranch !== self.INSTANCE.currentBranch) {
-                self.INSTANCE.currentBranch = currBranch;
-                broadcast({
-                    type: 'branch',
-                    change: true,
-                    prevBranch: self.INSTANCE.currentBranch,
-                    currBranch: currBranch
-                });
             } else {
-                let files = self.getChangelog();
-                broadcast((files.length > 0) ? {
-                    type: 'files',
-                    change: true,
-                    files: files,
-                    currBranch: currBranch
-                } : {
-                    type: 'none',
-                    change: false,
-                    currBranch: currBranch
-                });
-            }
+                // check if it is a branch change
+                let currBranch = self.gitCmd('current-branch');
+                if (currBranch !== self.INSTANCE.currentBranch) {
+                    self.INSTANCE.currentBranch = currBranch;
+                    broadcast({
+                        type: 'branch',
+                        change: true,
+                        prevBranch: self.INSTANCE.currentBranch,
+                        currBranch: currBranch
+                    });
+                } else {
+                    let files = self.getChangelog();
+                    broadcast((files.length > 0) ? {
+                        type: 'files',
+                        change: true,
+                        files: files,
+                        currBranch: currBranch
+                    } : {
+                        type: 'none',
+                        change: false,
+                        currBranch: currBranch
+                    });
+                }
+            }            
             self[PRIVATE_DATA].IS_READY = true;
         }
 
