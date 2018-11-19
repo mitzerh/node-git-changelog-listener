@@ -3,11 +3,11 @@
 
 const App = require('./index');
 
-const test = new App({
+const listener = new App({
     // repository path
-    basePath: './'
+    //basePath: './'
 });
 
-test.onChange((eventInfo) => {
+listener.onChange((eventInfo) => {
     console.log('it changed!', eventInfo);
 });

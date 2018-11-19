@@ -2,6 +2,7 @@
 'use strict';
 
 const GitCommands = require('./cmd');
+const Helper = require('./helper');
 const log = console.log;
 
 // private
@@ -15,17 +16,37 @@ class Listener extends GitCommands {
         super();
 
         this[PRIVATE_DATA] = {
+            // bool to check if it's initialized
             INITIALIZED: false,
+            // bool to set ready state for next interval to execute
             IS_READY: true,
+            // setInterval variable
             INTERVAL_INSTANCE: null,
-            EXECUTE_STACK: []
+            // callback functions stack
+            EXECUTE_STACK: [],
+            // bool to check if allowed to run
+            ALLOW: true
         };
 
-        this.PROPERTIES = props;
+        // default properties
+        this.PROPERTIES = ((d) => {
+            return {
+                basePath: d.basePath || __dirname,
+                interval: d.interval || 1000
+            };
+        })(props || {});
 
         this.INSTANCE = {
             currentBranch: this.gitCmd('current-branch')
         };
+
+        // check basePath if exists
+        if (!Helper.isPathExists(this.PROPERTIES.basePath)) {
+            this[PRIVATE_DATA].ALLOW = false;
+        } else if (Helper.isPathExists(`${this.PROPERTIES.basePath}/.git`)) {
+            // check if path is a repository
+            this[PRIVATE_DATA].ALLOW = false;
+        }
 
     }
 
@@ -40,15 +61,32 @@ class Listener extends GitCommands {
 
         self[PRIVATE_DATA].EXECUTE_STACK.push(callback);
 
-        if (!self[PRIVATE_DATA].INITIALIZED) {
-            self[PRIVATE_DATA].INTERVAL_INSTANCE = setInterval(() => {
-                trigger();
-            }, 1000);
+        if (!self[PRIVATE_DATA].ALLOW) {
+            return broadcast({
+                type: 'error',
+                message: 'path is not a valid github repository!',
+                change: false
+            });
         }
 
-        function trigger() {
+        if (!self[PRIVATE_DATA].INITIALIZED) {
+            self[PRIVATE_DATA].INITIALIZED = true;
+            self[PRIVATE_DATA].INTERVAL_INSTANCE = setInterval(() => {
+                trigger(true);
+            }, self.PROPERTIES.interval || 1000);
+        }
+
+        function trigger(first) {
             if (!self[PRIVATE_DATA].IS_READY) { return; }
             self[PRIVATE_DATA].IS_READY = false;
+
+            if (first) {
+                self.getChangelog();
+                return broadcast({
+                    type: 'initialize',
+                    change: false
+                });
+            }
 
             // check if it is a branch change
             let currBranch = self.gitCmd('current-branch');
