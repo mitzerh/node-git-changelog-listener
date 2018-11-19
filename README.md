@@ -7,14 +7,14 @@ Cron-driven changelog listener for git repositories
 
 #### basePath
 
-Type: `String`
+Type: `String`  
 Default: `__dirname`
 
 Set the git repository directory of where to run the listener.
 
 #### interval
 
-Type: `Number`
+Type: `Number`  
 Default: `1000`
 
 **(Optional)** Set the interval of how often to check for changes.
