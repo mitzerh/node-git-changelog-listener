@@ -80,7 +80,7 @@ class Listener extends GitCommands {
 
             if (first) {
                 self.getChangelog();
-                return broadcast({
+                broadcast({
                     type: 'initialize',
                     change: false
                 });
@@ -108,7 +108,7 @@ class Listener extends GitCommands {
                         currBranch: currBranch
                     });
                 }
-            }            
+            }
             self[PRIVATE_DATA].IS_READY = true;
         }
 
