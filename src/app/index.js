@@ -40,11 +40,8 @@ class Listener extends GitCommands {
             currentBranch: this.gitCmd('current-branch')
         };
 
-        // check basePath if exists
-        if (!Helper.isPathExists(this.PROPERTIES.basePath)) {
-            this[PRIVATE_DATA].ALLOW = false;
-        } else if (Helper.isPathExists(`${this.PROPERTIES.basePath}/.git`)) {
-            // check if path is a repository
+        // check if path is a repository
+        if (!Helper.isPathExists(`${this.PROPERTIES.basePath}/.git`)) {
             this[PRIVATE_DATA].ALLOW = false;
         }
 
