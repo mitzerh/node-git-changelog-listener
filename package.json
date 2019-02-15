@@ -1,6 +1,6 @@
 {
   "name": "git-changelog-listener",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Cron-driven changelog listener for git repositories",
   "main": "index.js",
   "scripts": {
