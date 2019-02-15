@@ -28,11 +28,41 @@ class Listener extends GitCommands {
             ALLOW: true
         };
 
+        // validate interval
+        // interval is in milliseconds
+        let interval = ((val) => {
+            let res = null;
+            if (typeof val !== 'number') {
+                let n = parseInt(val, 10);
+                res = (n < 100) ? 100 : n;
+            }
+            return res;
+        })(d.interval || 1000);
+
+        if (!interval) {
+            log('Error: invalid interval value..');
+            process.exit(1);
+        }
+
+        // validate basepath
+        let basePath = ((val) => {
+            let res = process.cwd();
+            if (typeof val === 'string') {
+                if (Helper.isPathExists(val)) {
+                    res = val;
+                } else {
+                    log('Error: invalid basePath value..');
+                    process.exit(1);
+                }
+            }
+            return res;
+        })(d.basePath);
+
         // default properties
         this.PROPERTIES = ((d) => {
             return {
-                basePath: d.basePath || process.cwd(),
-                interval: d.interval || 1000
+                basePath: basePath,
+                interval: interval
             };
         })(props || {});
 
