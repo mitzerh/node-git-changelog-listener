@@ -34,7 +34,7 @@ class Listener extends GitCommands {
         // interval is in milliseconds
         let interval = ((val) => {
             let res = null;
-            if (typeof val !== 'number') {
+            if (typeof val === 'number') {
                 let n = parseInt(val, 10);
                 res = (n < 100) ? 100 : n;
             }
