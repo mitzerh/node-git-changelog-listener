@@ -28,6 +28,8 @@ class Listener extends GitCommands {
             ALLOW: true
         };
 
+        props = props || {};
+
         // validate interval
         // interval is in milliseconds
         let interval = ((val) => {
@@ -37,7 +39,7 @@ class Listener extends GitCommands {
                 res = (n < 100) ? 100 : n;
             }
             return res;
-        })(d.interval || 1000);
+        })(props.interval || 1000);
 
         if (!interval) {
             log('Error: invalid interval value..');
@@ -56,15 +58,13 @@ class Listener extends GitCommands {
                 }
             }
             return res;
-        })(d.basePath);
+        })(props.basePath);
 
         // default properties
-        this.PROPERTIES = ((d) => {
-            return {
-                basePath: basePath,
-                interval: interval
-            };
-        })(props || {});
+        this.PROPERTIES = {
+            basePath: basePath,
+            interval: interval
+        };
 
         this.INSTANCE = {
             currentBranch: this.gitCmd('current-branch')
