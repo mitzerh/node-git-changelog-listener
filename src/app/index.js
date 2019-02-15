@@ -78,15 +78,17 @@ class Listener extends GitCommands {
             if (!self[PRIVATE_DATA].IS_READY) { return; }
             self[PRIVATE_DATA].IS_READY = false;
 
+            let currBranch = self.gitCmd('current-branch');
+
             if (first) {
                 self.getChangelog();
                 broadcast({
                     type: 'initialize',
-                    change: false
+                    change: false,
+                    currBranch: currBranch
                 });
             } else {
                 // check if it is a branch change
-                let currBranch = self.gitCmd('current-branch');
                 if (currBranch !== self.INSTANCE.currentBranch) {
                     self.INSTANCE.currentBranch = currBranch;
                     broadcast({
