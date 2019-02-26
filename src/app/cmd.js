@@ -9,6 +9,7 @@ class GitCommands {
     constructor() {
 
         this.CHECKSUM_MAP = {};
+        this.CURRENT_SHA = null;
 
     }
 
@@ -102,6 +103,24 @@ class GitCommands {
         let files = [];
         let changedFiles = [];
 
+        // check current sha
+        let items = ((sha) => {
+            let res = [];
+            if (!self.CURRENT_SHA) {
+                self.CURRENT_SHA = sha;
+            } else {
+                let curr = self.CURRENT_SHA;
+                // if not equal, there's a change!
+                if (curr !== sha) {
+                    res = self.getShaFilesChange(curr, sha);
+                    self.CURRENT_SHA = sha;
+                }
+            }
+            return res;
+        })(self.gitCmd('head-sha'));
+
+        console.log('items here >>>', items);
+
         // local changes
         let local_diff = self.gitCmd("diff-status");
         // local file changes
@@ -109,8 +128,7 @@ class GitCommands {
         // possible origin changes
         let origin_diff = self.gitCmd("diff-status-origin");
 
-        let items = local_diff.split("\n");
-
+        items = items.concat(local_diff.split("\n"));
         items = items.concat(origin_diff.split("\n"));
 
         (local_file_change.split("\n")).forEach((filepath) => {
@@ -126,17 +144,21 @@ class GitCommands {
                 item = item.replace(/\s+|\t/g, ' ');
 
                 let sp = item.split(' ');
-                let code = (sp[0] || '').trim();
-                let file = (sp[1] || '').trim();
+                if (sp.length === 1) {
+                    files.push(sp[0]);
+                } else {
+                    let code = (sp[0] || '').trim();
+                    let file = (sp[1] || '').trim();
 
-                if (file.length > 1 && Helper.allowStatusCode(code)) {
-                    // check if its an unchecked folder, add all contents inside it
-                    if (/\/$/.test(file) && /^\?/.test(code)) {
-                        files = files.concat(Helper.listDir(path.join(props.basePath, file)));
-                    } else {
-                        files.push(file);
+                    if (file.length > 1 && Helper.allowStatusCode(code)) {
+                        // check if its an unchecked folder, add all contents inside it
+                        if (/\/$/.test(file) && /^\?/.test(code)) {
+                            files = files.concat(Helper.listDir(path.join(props.basePath, file)));
+                        } else {
+                            files.push(file);
+                        }
+
                     }
-
                 }
 
             }
