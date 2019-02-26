@@ -119,8 +119,6 @@ class GitCommands {
             return res;
         })(self.gitCmd('head-sha'));
 
-        console.log('items here >>>', items);
-
         // local changes
         let local_diff = self.gitCmd("diff-status");
         // local file changes
